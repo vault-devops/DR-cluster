@@ -1,0 +1,32 @@
+version: "3.9"
+services: 
+    vault01: 
+        image: vault_ent
+        build:   
+            context: "./" #defines either a path to a directory containing a Dockerfile, 
+        ports: 
+            - "8200:8200"
+            - "8201:8201"
+        cap_add:
+            - IPC_LOCK
+        environment:
+            # VAULT_REDIRECT_ADDR: "http://0.0.0.0:8200"   
+            # VAULT_CLUSTER_ADDR:  "http://0.0.0.0:8200"  
+            VAULT_LOCAL_CONFIG: '{"backend": {"raft": {"path": "/vault/file"}}, "default_lease_ttl": "168h", "max_lease_ttl": "720h", "listener": {"tcp":{"address": "0.0.0.0:8200", "tls_disable": true}}, "cluster_addr":"http://vault01:8201", "api_addr":"http://vault01:8200"}'
+        command:  server
+        
+    vault02: 
+        image: vault_ent
+        build:   
+            context: "./" #defines either a path to a directory containing a Dockerfile, 
+        ports: 
+            - "8300:8300"
+            - "8301:8301"
+        cap_add:
+            - IPC_LOCK
+        environment:
+            # VAULT_REDIRECT_ADDR: "http://0.0.0.0:8300"   
+            # VAULT_CLUSTER_ADDR:  "http://0.0.0.0:8300"   
+            VAULT_LOCAL_CONFIG: '{"backend": {"raft": {"path": "/vault/file"}}, "default_lease_ttl": "168h", "max_lease_ttl": "720h", "listener": {"tcp":{"address": "0.0.0.0:8300", "tls_disable": true}},"cluster_addr":"http://vault02:8301", "api_addr":"http://vault02:8300"}'
+
+        command:  server
